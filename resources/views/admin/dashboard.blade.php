@@ -10,10 +10,10 @@
       <h2 class="text-xl font-semibold text-blue-600">Posts</h2>
       <p class="text-gray-500">Create, edit, and publish news articles.</p>
     </a>
-    <div class="bg-white shadow rounded-lg p-6 text-center">
-      <h2 class="text-xl font-semibold">Users</h2>
+    <a href="{{ route('users.index') }}" class="block bg-white shadow rounded-lg p-6 text-center hover:shadow-lg transition">
+      <h2 class="text-xl font-semibold text-blue-600">Users</h2>
       <p class="text-gray-500">View registered users and their points.</p>
-    </div>
+    </a>
     <div class="bg-white shadow rounded-lg p-6 text-center">
       <h2 class="text-xl font-semibold">Rewards</h2>
       <p class="text-gray-500">Manage reward items and redemptions.</p>

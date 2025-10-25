@@ -1,6 +1,7 @@
 <?php
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\PostController;
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -16,4 +17,6 @@ Route::middleware(['auth:web'])->prefix('admin')->group(function () {
     })->name('admin.dashboard');
 
     Route::resource('/posts', PostController::class);
+    Route::resource('users', UserController::class);
+
 });

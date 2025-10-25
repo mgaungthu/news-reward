@@ -14,19 +14,19 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::with('author')
-            ->where('status', 'published')
-            ->latest()
-            ->get();
+    $posts = Post::with(['author', 'rewards', 'userClaims'])
+        ->where('status', 'published')
+        ->latest()
+        ->get();
         return response()->json($posts);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show($slug)
+    public function show($id)
     {
-        $post = Post::with('author')->where('slug', $slug)->firstOrFail();
+        $post = Post::with(['author', 'rewards', 'userClaims'])->where('id', $id)->firstOrFail();
         return response()->json($post);
     }
 
