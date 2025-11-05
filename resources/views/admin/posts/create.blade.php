@@ -10,7 +10,7 @@
     <h1 class="text-2xl font-semibold">Create Post</h1>
     <a href="{{ route('posts.index') }}"
        class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-md">
-      ← Back
+     Back
     </a>
   </div>
   <form method="POST" action="{{ route('posts.store') }}" enctype="multipart/form-data" class="space-y-6">
@@ -69,6 +69,41 @@
       </select>
       @error('status')
         <p class="text-red-500 text-sm mt-1">{{ $message }}</p       >
+      @enderror
+    </div>
+
+  <div x-data="{ showPoints: {{ old('is_vip') ? 'true' : 'false' }} }" class="mt-4">
+    <label class="block text-gray-700 font-medium mb-2">VIP Post?</label>
+    <input type="hidden" name="is_vip" value="0">
+    <label class="inline-flex items-center space-x-2">
+      <input type="checkbox" name="is_vip" value="1"
+             x-model="showPoints"
+             {{ old('is_vip') ? 'checked' : '' }}>
+      <span>Mark as VIP</span>
+    </label>
+
+    <template x-if="showPoints">
+      <div class="mt-3">
+        <label class="block text-gray-700 font-medium">Required Points</label>
+        <input type="number" name="required_points" min="1"
+               class="w-full border-b-2 border-gray-300 focus:border-blue-500 focus:outline-none py-2"
+               required>
+        @error('required_points')
+          <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+        @enderror
+      </div>
+    </template>
+
+    @error('is_vip')
+      <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+    @enderror
+  </div>
+
+    <div>
+      <label class="block text-gray-700 font-medium">Vimeo Video URL</label>
+      <input name="vimeo_url" type="url" placeholder="https://vimeo.com/123456789" class="w-full border-b-2 border-gray-300 focus:border-blue-500 focus:outline-none py-2">
+      @error('vimeo_url')
+        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
       @enderror
     </div>
 

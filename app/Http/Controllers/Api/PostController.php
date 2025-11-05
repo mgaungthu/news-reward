@@ -4,30 +4,105 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Post;
+use App\Models\UserPostClaim;
+use App\Repositories\PostRepository;
+use App\Services\PostService;
+use App\Services\PurchaseService;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct(
+        private PostService $postService,
+        private PurchaseService $purchaseService,
+        private PostRepository $posts
+    ) {}
+
+    // Public non-VIP list
     public function index()
     {
-    $posts = Post::with(['author', 'rewards', 'userClaims'])
-        ->where('status', 'published')
-        ->latest()
-        ->get();
-        return response()->json($posts);
+        return response()->json($this->postService->listPublic());
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show($id)
+    // VIP list (public listing is OK; details are still protected by show())
+    public function vipPosts()
     {
-        $post = Post::with(['author', 'rewards', 'userClaims'])->where('id', $id)->firstOrFail();
-        return response()->json($post);
+        return response()->json($this->postService->listVip());
     }
 
+    // Show a post (policy-enforced)
+    public function show(Request $request, $id)
+    {
+        $user = Auth::guard('api')->user(); // may be null for guests
+
+        try {
+            $post = $this->postService->show($user, (int) $id);
+            return response()->json($post);
+        } catch (AuthorizationException $e) {
+            // If not authorized and it's VIP, return informative payload
+            $post = $this->posts->findWithRelationsOrFail((int) $id);
+
+            return response()->json([
+                'message' => 'You need to buy this post before reading.',
+                'required_points' => $post->required_points,
+                'user_points' => $user?->points,
+            ], 403);
+        }
+    }
+
+    // Buy a VIP post (must be authenticated—protect via route middleware)
+    public function buy(Request $request, $id)
+    {
+        $user = Auth::guard('api')->user();
+        if (!$user) {
+            return response()->json(['message' => 'Login required to buy VIP post.'], 401);
+        }
+
+        $post = Post::findOrFail((int) $id);
+
+        try {
+            $result = $this->purchaseService->buyVipPost($user, $post);
+            return response()->json($result);
+        } catch (AuthorizationException $e) {
+            $status = str_contains($e->getMessage(), 'Not enough points') ? 403 : 400;
+            return response()->json(['message' => $e->getMessage()], $status);
+        }
+    }
+
+
+    public function purchasedVipPosts()
+    {
+        $user = Auth::guard('api')->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Login required.'], 401);
+        }
+
+        $vipPosts = $user->vipPurchases()->with('author')->get();
+
+        return response()->json($vipPosts);
+    }
+
+
+    public function resetUserClaims()
+    {
+        $user = Auth::guard('api')->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Login required.'], 401);
+        }
+
+        // Option B: Reset claim status instead of deleting
+        UserPostClaim::where('user_id', $user->id)
+            ->update([
+                'status' => 'pending',
+                'claimed_at' => null,
+            ]);
+
+        return response()->json([
+            'message' => 'Your post claims have been reset successfully.'
+        ]);
+    }
 }

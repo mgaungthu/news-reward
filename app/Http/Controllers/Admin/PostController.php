@@ -24,7 +24,8 @@ class PostController extends Controller
     }
 
     public function store(Request $request)
-    {
+    {   
+        // dd(['is_vip' => $request->input('is_vip')]);
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'excerpt' => 'nullable|string',
@@ -32,7 +33,10 @@ class PostController extends Controller
             'status' => 'required|in:draft,published',
             'category_id' => 'nullable|exists:categories,id',
             'tags' => 'nullable|string',
-            'read_more_url' => 'nullable|url|max:255'
+            'read_more_url' => 'nullable|url|max:255',
+            'is_vip' => 'boolean',
+            'vimeo_url' => 'nullable|url',
+            'required_points' => 'nullable|integer|min:1',
         ]);
 
         if ($request->hasFile('feature_image')) {
@@ -45,6 +49,13 @@ class PostController extends Controller
         $data['category_id'] = $request->category_id;
         $data['tags'] = $request->tags;
         $data['read_more_url'] = $request->read_more_url;
+        $data['is_vip'] = $request->boolean('is_vip');
+        if ($data['is_vip']) {
+            $data['required_points'] = $request->input('required_points', 0);
+        } else {
+            $data['required_points'] = 0;
+        }
+        $data['vimeo_url'] = $request->vimeo_url;
         // Check for duplicate slug
         if (Post::where('slug', $data['slug'])->exists()) {
             return back()
@@ -86,6 +97,9 @@ class PostController extends Controller
             'category_id' => 'nullable|exists:categories,id',
             'tags' => 'nullable|string',
             'read_more_url' => 'nullable|url|max:255',
+            'is_vip' => 'boolean',
+            'vimeo_url' => 'nullable|url',
+            'required_points' => 'nullable|integer|min:1',
         ]);
 
         if ($request->hasFile('feature_image')) {
@@ -96,6 +110,13 @@ class PostController extends Controller
         $validated['category_id'] = $request->category_id;
         $validated['tags'] = $request->tags;
         $validated['read_more_url'] = $request->read_more_url;
+        $validated['is_vip'] = $request->boolean('is_vip');
+        if ($validated['is_vip']) {
+            $validated['required_points'] = $request->input('required_points', 0);
+        } else {
+            $validated['required_points'] = 0;
+        }
+        $validated['vimeo_url'] = $request->vimeo_url;
 
         $post->update($validated);
 

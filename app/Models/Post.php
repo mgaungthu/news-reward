@@ -11,7 +11,9 @@ class Post extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'title', 'slug', 'excerpt', 'body', 'status', 'feature_image', 'category_id', 'tags', 'read_more_url'];
+    protected $fillable = ['user_id', 'title', 'slug', 'excerpt', 'body', 'status', 'feature_image', 'category_id', 'tags', 'read_more_url', 'vimeo_url', 'is_vip', 'required_points'];
+
+    protected $appends = ['feature_image_url'];
 
      public static function boot()
     {
@@ -50,5 +52,21 @@ class Post extends Model
     public function getTagsArrayAttribute()
     {
         return explode(',', $this->tags ?? '');
+    }
+
+    public function purchasers()
+    {
+        return $this->belongsToMany(User::class, 'vip_post_purchases')
+                    ->withTimestamps();
+    }
+
+    public function isVip(): bool
+    {
+        return (bool) $this->is_vip;
+    }
+
+    public function getFeatureImageUrlAttribute()
+    {
+        return $this->feature_image ? asset('storage/' . $this->feature_image) : null;
     }
 }

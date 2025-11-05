@@ -6,13 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+
 
 class UserController extends Controller
 {
     public function index()
     {
-    $users = User::with('postClaims')->latest()->paginate(10);
-    return view('admin.users.index', compact('users'));
+        $users = User::with('postClaims')
+        ->where('is_admin',0)
+        ->latest()
+        ->paginate(10);
+        
+        return view('admin.users.index', compact('users'));
     }
 
     public function create()
@@ -45,20 +51,17 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:8|confirmed',
+            'deduct_points' => 'nullable|integer|min:0',
         ]);
 
-        $user->update([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => $validated['password']
-                ? Hash::make($validated['password'])
-                : $user->password,
-        ]);
 
-        return redirect()->route('users.index')->with('success', 'User updated successfully!');
+        // handle deduction
+        if (!empty($validated['deduct_points']) && $validated['deduct_points'] > 0) {
+            $user->points = max(0, $user->points - $validated['deduct_points']);
+            $user->save();
+        }
+
+        return redirect()->route('users.index')->with('success', 'User point deduction is successfully!');
     }
 
     public function destroy(User $user)

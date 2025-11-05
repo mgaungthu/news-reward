@@ -15,10 +15,19 @@ class PostClaimController extends Controller
     {
         $user = Auth::user();
 
+
+
         $result = $this->claimService->claim($user, $post);
         $claim = $result['claim'];
 
-        if ($result['new']) {
+                 return response()->json([
+                'message' => 'You have started earning points for this post!',
+                'post_id' => $post->id,
+                'claim' => $claim,
+                'user_points' => $user->points,
+            ]);
+
+        if (!empty($result['new'])) {
             return response()->json([
                 'message' => 'You have started earning points for this post!',
                 'post_id' => $post->id,
@@ -27,12 +36,18 @@ class PostClaimController extends Controller
             ]);
         }
 
+        if (!empty($result['updated'])) {
+            return response()->json([
+                'message' => 'You have successfully claimed this post reward!',
+                'post_id' => $post->id,
+                'status' => $claim->status,
+                'claimed_at' => $claim->claimed_at,
+                'user_points' => $user->points,
+            ]);
+        }
+
         return response()->json([
-            'message' => 'You have already claimed this reward.',
-            'post_id' => $post->id,
-            'status' => $claim->status,
-            'claimed_at' => $claim->claimed_at,
-            'user_points' => $user->points,
+            'message' => 'Invalid claim request or already claimed.',
         ], 400);
     }
 }

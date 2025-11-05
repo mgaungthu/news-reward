@@ -4,14 +4,16 @@
 <div class="p-6">
   <div class="flex items-center justify-between mb-6">
     <h1 class="text-2xl font-semibold">Users</h1>
-    <a href="{{ route('users.create') }}"
+    <!-- <a href="{{ route('users.create') }}"
        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md">
        + Add New User
-    </a>
+    </a> -->
   </div>
 
   @if(session('success'))
-    <p class="text-green-600 mb-4">{{ session('success') }}</p>
+    <div class="mb-4 p-4 border-l-4 border-green-500 bg-green-100 rounded-md">
+        <p class="text-green-700 font-medium">{{ session('success') }}</p>
+    </div>
   @endif
 
   <table class="min-w-full bg-white border">
@@ -20,7 +22,6 @@
         <th class="py-3 px-4 border-b">Name</th>
         <th class="py-3 px-4 border-b">Email</th>
         <th class="py-3 px-4 border-b text-center">Points</th>
-        <th class="py-3 px-4 border-b text-center">Claimed</th>
         <th class="py-3 px-4 border-b">Created</th>
         <th class="py-3 px-4 border-b text-right">Actions</th>
       </tr>
@@ -31,10 +32,7 @@
         <td class="py-3 px-4 border-b">{{ $user->name }}</td>
         <td class="py-3 px-4 border-b">{{ $user->email }}</td>
         <td class="py-3 px-4 border-b text-center text-yellow-600 font-semibold">
-          {{ $user->postClaims->where('status', 'pending')->count() }}
-        </td>
-        <td class="py-3 px-4 border-b text-center text-green-600 font-semibold">
-          {{ $user->postClaims->where('status', 'claimed')->count() }}
+          {{ $user->points }}
         </td>
         <td class="py-3 px-4 border-b">{{ $user->created_at->diffForHumans() }}</td>
         <td class="py-3 px-4 border-b text-right space-x-2">

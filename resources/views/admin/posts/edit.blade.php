@@ -4,7 +4,7 @@
 <div class="p-6 max-w-3xl mx-auto">
   <div class="flex items-center justify-between mb-6">
     <h1 class="text-3xl font-bold text-gray-900">Edit Post</h1>
-    <a href="{{ route('posts.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-md">← Back</a>
+    <a href="{{ route('posts.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-md">Back</a>
   </div>
 
   <form method="POST" action="{{ route('posts.update', $post) }}" enctype="multipart/form-data" class="space-y-6" x-data="{
@@ -77,6 +77,42 @@
         <option value="published" @selected($post->status == 'published')>Published</option>
       </select>
       @error('status')
+        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+      @enderror
+    </div>
+
+    <div x-data="{ showPoints: {{ old('is_vip', (int) $post->is_vip) ? 'true' : 'false' }} }" class="mt-4">
+      <label class="block text-sm font-medium text-gray-700 mb-2">VIP Post?</label>
+      <input type="hidden" name="is_vip" value="0">
+      <label class="inline-flex items-center space-x-2">
+        <input type="checkbox" name="is_vip" value="1" x-model="showPoints" {{ old('is_vip', (int) $post->is_vip) ? 'checked' : '' }}>
+        <span>Mark as VIP</span>
+      </label>
+
+      <template x-if="showPoints">
+        <div class="mt-3">
+          <label for="required_points" class="block text-sm font-medium text-gray-700">Required Points</label>
+          <input id="required_points" type="number" name="required_points" min="1"
+                 value="{{ old('required_points', $post->required_points) }}"
+                 class="w-full border-b-2 border-gray-300 focus:border-blue-500 focus:outline-none py-2"
+                 required>
+          @error('required_points')
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+          @enderror
+        </div>
+      </template>
+
+      @error('is_vip')
+        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+      @enderror
+    </div>
+
+    <div>
+      <label for="vimeo_url" class="block text-sm font-medium text-gray-700">Vimeo Video URL</label>
+      <input id="vimeo_url" name="vimeo_url" type="url" placeholder="https://vimeo.com/123456789"
+        value="{{ old('vimeo_url', $post->vimeo_url) }}"
+        class="w-full border-b-2 border-gray-300 focus:border-blue-500 focus:outline-none py-2">
+      @error('vimeo_url')
         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
       @enderror
     </div>

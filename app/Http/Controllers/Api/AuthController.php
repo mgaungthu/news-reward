@@ -59,7 +59,7 @@ class AuthController extends Controller
             'message' => 'Login successful',
             'user'    => $user,
             'token'   => $token,
-        ]);
+        ], 200);
     }
 
     // 🚪 Logout user
@@ -68,6 +68,44 @@ class AuthController extends Controller
         $token = $request->user()->token();
         $token->revoke();
 
-        return response()->json(['message' => 'Successfully logged out']);
+        return response()->json(['message' => 'Successfully logged out'], 200);
+    }
+
+    // 🧾 Update user profile (name, email, password)
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:6|confirmed',
+        ]);
+
+        if (isset($validated['name'])) {
+            $user->name = $validated['name'];
+        }
+
+        if (isset($validated['email'])) {
+            $user->email = $validated['email'];
+        }
+
+        if (!empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
+        }
+
+        $user->save();
+
+        return response()->json([
+            'message' => 'Profile updated successfully',
+            'user' => $user,
+        ], 200);
+    }
+    // 👤 Get authenticated user info
+    public function me(Request $request)
+    {
+        return response()->json([
+            'user' => $request->user(),
+        ], 200);
     }
 }

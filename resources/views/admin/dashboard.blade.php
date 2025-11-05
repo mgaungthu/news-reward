@@ -14,10 +14,10 @@
       <h2 class="text-xl font-semibold text-blue-600">Users</h2>
       <p class="text-gray-500">View registered users and their points.</p>
     </a>
-    <div class="bg-white shadow rounded-lg p-6 text-center">
-      <h2 class="text-xl font-semibold">Rewards</h2>
-      <p class="text-gray-500">Manage reward items and redemptions.</p>
-    </div>
+    <a href="{{ route('settings.index') }}" class="bg-white shadow rounded-lg p-6 text-center">
+      <h2 class="text-xl font-semibold text-blue-600">Setting</h2>
+      <p class="text-gray-500">Manage Ad unit and Banner image.</p>
+    </a>
   </div>
 </div>
 @endsection

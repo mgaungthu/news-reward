@@ -62,4 +62,10 @@ class User extends Authenticatable
     {
         return $this->hasManyThrough(Post::class, UserPostClaim::class, 'user_id', 'id', 'id', 'post_id');
     }
+
+    public function vipPurchases()
+    {
+        return $this->belongsToMany(Post::class, 'vip_post_purchases')
+                    ->withTimestamps();
+    }
 }
