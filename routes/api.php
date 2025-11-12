@@ -23,6 +23,7 @@ Route::get('/posts', [PostController::class, 'index']);
 Route::get('/posts/{id}', [PostController::class, 'show']);
 Route::get('/vip-posts', [PostController::class, 'vipPosts']);
 Route::get('/settings', [SettingController::class, 'index']);
+Route::post('/user/change-password', [AuthController::class, 'changePassword']);
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -33,4 +34,6 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/user/vip-posts', [PostController::class, 'purchasedVipPosts']);
     Route::post('/user/reset-claims', [PostController::class, 'resetUserClaims']);
     Route::post('/save-push-token', [NotificationController::class, 'savePushToken']);
+    
+    Route::delete('/user/delete', [AuthController::class, 'deleteAccount']);
 });

@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
+
 
 class User extends Authenticatable
 {
@@ -34,6 +36,15 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    protected static function booted()
+    {
+        static::creating(function ($user) {
+            if (!$user->referral_code) {
+                $user->referral_code = strtoupper(Str::random(8)); // eg. AB12CD34
+            }
+        });
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -67,5 +78,16 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Post::class, 'vip_post_purchases')
                     ->withTimestamps();
+    }
+
+
+    public function referrer()
+    {
+        return $this->belongsTo(User::class, 'referred_by', 'referral_code');
+    }
+
+    public function referrals()
+    {
+        return $this->hasMany(User::class, 'referred_by', 'referral_code');
     }
 }

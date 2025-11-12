@@ -18,6 +18,11 @@
       <h2 class="text-xl font-semibold text-blue-600">Setting</h2>
       <p class="text-gray-500">Manage Ad unit and Banner image.</p>
     </a>
+
+     <a href="{{ route('notifications.index') }}" class="bg-white shadow rounded-lg p-6 text-center">
+      <h2 class="text-xl font-semibold text-blue-600">Notification</h2>
+      <p class="text-gray-500">Send notification to users.</p>
+    </a>
   </div>
 </div>
 @endsection

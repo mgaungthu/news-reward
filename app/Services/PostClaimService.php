@@ -49,8 +49,18 @@ class PostClaimService
     {
         $pointsPerClaim = (int) app('points_per_claim');
 
-        
+        // Add normal claim points to the referred user
         $user->points += $pointsPerClaim;
         $user->save();
+
+        // If user was referred by someone, give 0.01 to referrer each claim
+        if ($user->referred_by) {
+            $referrer = User::where('referral_code', $user->referred_by)->first();
+
+            if ($referrer) {
+                $referrer->points += 0.1;
+                $referrer->save();
+            }
+        }
     }
 }
