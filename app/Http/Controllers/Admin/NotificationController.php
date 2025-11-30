@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\User;
+use Illuminate\Support\Facades\Validator;
 
 class NotificationController extends Controller
 {
@@ -20,7 +21,7 @@ class NotificationController extends Controller
      */
     public function index(Request $request)
     {
-        $users = User::select('id', 'name', 'expo_push_token')
+        $users = User::select('id', 'name', 'expo_push_token', 'email')
             ->whereNotNull('expo_push_token')
             ->get();
 
@@ -32,12 +33,16 @@ class NotificationController extends Controller
      */
     public function sendToUser(Request $request)
     {
-        $request->validate([
-            'user_ids' => 'required|array',
-            'user_ids.*' => 'integer|exists:users,id',
-            'title' => 'required|string',
-            'body' => 'required|string',
+        $validator = Validator::make($request->all(), [
+        'user_ids' => 'required|array',
+        'title' => 'required|string',
+        'body' => 'required|string',
         ]);
+
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
         $users = User::whereIn('id', $request->user_ids)
             ->whereNotNull('expo_push_token')
@@ -47,24 +52,21 @@ class NotificationController extends Controller
             return redirect()->back()->with('error', 'No users with valid Expo push tokens found.');
         }
 
-        // Build array of message payloads
-        $messages = $users->map(function ($user) use ($request) {
-            return [
-                'to' => $user->expo_push_token,
-                'sound' => 'default',
-                'title' => $request->title,
-                'body' => $request->body,
-                'data' => (object)[],
-            ];
-        })->toArray();
+        $tokens = $users->pluck('expo_push_token')->toArray();
 
-        // Send to Expo in one request
-        $response = Http::post('https://exp.host/--/api/v2/push/send', $messages);
+        $message = [
+            'to' => $tokens,
+            'sound' => 'default',
+            'title' => $request->title,
+            'body' => $request->body,
+            'data' => (object)[],
+        ];
 
-        if ($response->successful()) {
-            return redirect()->back()->with('success', 'Notification sent successfully to selected users!');
+        $response = Http::post('https://exp.host/--/api/v2/push/send', $message);
+        if (!$response->successful()) {
+            return redirect()->back()->with('error', 'Notification failed: ' . $response->body());
         }
 
-        return redirect()->back()->with('error', 'Failed to send notifications: ' . $response->body());
+        return redirect()->back()->with('success', 'Notification sent successfully to selected users!');
     }
 }

@@ -43,6 +43,15 @@
             <label class="block text-sm font-medium text-gray-700 mt-4 mb-2">App Open Ad Unit ID</label>
             <input type="text" name="ad_app_open_id_android" value="{{ $settings['ad_app_open_id_android'] ?? '' }}" placeholder="/6499/example/app-open (Android)" class="w-full border-b border-gray-300 focus:border-blue-500 focus:outline-none py-2 px-1 mb-2" />
             <input type="text" name="ad_app_open_id_ios" value="{{ $settings['ad_app_open_id_ios'] ?? '' }}" placeholder="/6499/example/app-open (iOS)" class="w-full border-b border-gray-300 focus:border-blue-500 focus:outline-none py-2 px-1" />
+
+            <!-- Native Ads -->
+            <label class="block text-sm font-medium text-gray-700 mt-4 mb-2">Native Ad Unit ID</label>
+            <input type="text" name="ad_native_id_android" value="{{ $settings['ad_native_id_android'] ?? '' }}" placeholder="/6499/example/native (Android)" class="w-full border-b border-gray-300 focus:border-blue-500 focus:outline-none py-2 px-1 mb-2" />
+            <input type="text" name="ad_native_id_ios" value="{{ $settings['ad_native_id_ios'] ?? '' }}" placeholder="/6499/example/native (iOS)" class="w-full border-b border-gray-300 focus:border-blue-500 focus:outline-none py-2 px-1" />
+
+            <!-- Support Email -->
+            <label class="block text-sm font-medium text-gray-700 mt-4 mb-2">Support Email</label>
+            <input type="email" name="email" value="{{ $settings['email'] ?? '' }}" placeholder="support@example.com" class="w-full border-b border-gray-300 focus:border-blue-500 focus:outline-none py-2 px-1" />
         </div>
 
         <div class="bg-white shadow-md rounded-lg p-6 mb-6">

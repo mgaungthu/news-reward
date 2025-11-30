@@ -88,6 +88,26 @@ class PostController extends Controller
 
     public function resetUserClaims()
     {
+        // Cooldown: allow reset only once every 3 minutes
+        $userId = Auth::guard('api')->id();
+        $cacheKey = "reset_claim_cooldown_{$userId}";
+
+        // If cache key exists, user must wait
+        if (cache()->has($cacheKey)) {
+            $secondsLeft = cache()->get($cacheKey) - time();
+            $minutesLeft = ceil($secondsLeft / 60);
+
+            return response()->json([
+                'message' => "Please wait {$minutesLeft} minute(s) before resetting again."
+            ], 429);
+        }
+
+        // Set cooldown (store next allowed timestamp)
+        cache()->put($cacheKey, time() + (3 * 60), 3 * 60);
+
+        // Allow only mobile devices to reset claims
+        
+
         $user = Auth::guard('api')->user();
 
         if (!$user) {

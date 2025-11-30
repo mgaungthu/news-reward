@@ -24,6 +24,12 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'apple' => [
+    'shared_secret' => env('APPLE_SHARED_SECRET'),
+    ],
+    'google' => [
+    'package_name' => env('GOOGLE_PLAY_PACKAGE_NAME', 'com.mandalayads.lotayadinga'),
+    ],
     'resend' => [
         'key' => env('RESEND_KEY'),
     ],

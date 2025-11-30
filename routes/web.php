@@ -13,7 +13,7 @@ Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.
 // Admin Logout
 Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 
-Route::middleware(['auth:web'])->prefix('admin')->group(function () {
+Route::middleware(['auth:web', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', function() {
         return view('admin.dashboard');
     })->name('admin.dashboard');

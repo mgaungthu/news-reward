@@ -15,18 +15,25 @@ class PostClaimController extends Controller
     {
         $user = Auth::user();
 
-
-
         $result = $this->claimService->claim($user, $post);
+
+        // Handle service-level errors (mobile-only protection, limits, etc.)
+        if (!empty($result['error'])) {
+            return response()->json([
+                'message' => $result['message'] ?? 'Request blocked.',
+            ], 422);
+        }
+
+        // Must have claim returned
+        if (empty($result['claim'])) {
+            return response()->json([
+                'message' => 'Invalid claim request or already claimed.',
+            ], 400);
+        }
+
         $claim = $result['claim'];
 
-                 return response()->json([
-                'message' => 'You have started earning points for this post!',
-                'post_id' => $post->id,
-                'claim' => $claim,
-                'user_points' => $user->points,
-            ]);
-
+        // New claim
         if (!empty($result['new'])) {
             return response()->json([
                 'message' => 'You have started earning points for this post!',
@@ -36,16 +43,18 @@ class PostClaimController extends Controller
             ]);
         }
 
+        // Updated claim
         if (!empty($result['updated'])) {
             return response()->json([
                 'message' => 'You have successfully claimed this post reward!',
-                'post_id' => $post->id,
-                'status' => $claim->status,
-                'claimed_at' => $claim->claimed_at,
+                'post_id'   => $post->id,
+                'status'    => $claim->status,
+                'claimed_at'=> $claim->claimed_at,
                 'user_points' => $user->points,
             ]);
         }
 
+        // Default fallback
         return response()->json([
             'message' => 'Invalid claim request or already claimed.',
         ], 400);

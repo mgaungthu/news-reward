@@ -25,6 +25,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'email_verification_code',
+        'email_verified_at',
     ];
 
     /**
@@ -89,5 +91,10 @@ class User extends Authenticatable
     public function referrals()
     {
         return $this->hasMany(User::class, 'referred_by', 'referral_code');
+    }
+
+    public function pointRecords()
+    {
+        return $this->hasMany(UserPointRecord::class);
     }
 }

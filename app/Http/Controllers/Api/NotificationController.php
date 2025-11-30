@@ -18,10 +18,10 @@ class NotificationController extends Controller
         $user = Auth::user();
 
         // Only update if the token is new or different
-        if ($user->expo_push_token !== $request->expo_push_token) {
+        
             $user->expo_push_token = $request->expo_push_token;
             $user->save();
-        }
+        
 
         return response()->json(['message' => 'Expo push token saved successfully']);
     }
